@@ -3,6 +3,8 @@ package checkers.checker;
 import checkers.CheckersSettings;
 import checkers.players.PlayerSide;
 import checkers.position.BoardPosition;
+import checkers.position.MovementSpeed;
+import checkers.position.MovingPosition;
 import checkers.position.Positionable;
 import javafx.scene.canvas.GraphicsContext;
 import checkers.util.Vector2d;
@@ -68,6 +70,20 @@ public class Checker {
 
     public void update(double secondsSinceStart) {
         position.update(secondsSinceStart);
+
+        if (this.position instanceof MovingPosition) {
+            final MovingPosition movingPosition = (MovingPosition) this.position;
+            if (movingPosition.hasCompleted()) {
+                this.position = new BoardPosition(movingPosition.getDestinationPosition());
+            }
+        }
+    }
+
+    public void move(Vector2i newPosition) {
+        this.position = new MovingPosition(
+                ((BoardPosition) this.position),
+                new BoardPosition(newPosition),
+                MovementSpeed.SLOW);
     }
 
     public boolean isSelected() {
@@ -132,15 +148,15 @@ public class Checker {
             this.selectionShiftFromChecker = (checkerSize - selectionSize) / 2.0; // Will be negative
         }
 
-        public final double checkerShiftFromCell;
-        public final double checkerSize;
+        private final double checkerShiftFromCell;
+        private final double checkerSize;
 
-        public final double firstInnerCircleSize;
-        public final double secondInnerCircleSize;
-        public final double firstInnerCircleShiftFromChecker;
-        public final double secondInnerCircleShiftFromChecker;
+        private final double firstInnerCircleSize;
+        private final double secondInnerCircleSize;
+        private final double firstInnerCircleShiftFromChecker;
+        private final double secondInnerCircleShiftFromChecker;
 
-        public final double selectionSize;
-        public final double selectionShiftFromChecker;
+        private final double selectionSize;
+        private final double selectionShiftFromChecker;
     }
 }

@@ -6,6 +6,7 @@ import checkers.board.BoardCellColor;
 import checkers.checker.Checker;
 import checkers.checker.CheckerColor;
 import checkers.players.Player;
+import checkers.util.Vector2i;
 import javafx.scene.canvas.GraphicsContext;
 import checkers.util.Vector2d;
 
@@ -29,13 +30,13 @@ public class Game {
     public Game(
             GraphicsContext gc,
             int boardSizeInCells,
-            Player firstPlayer, Player secondPlayer,
+            Player playerUp, Player playerDown,
             CheckerColor firstPlayerCheckerColor, CheckerColor secondPlayerCheckerColor,
             BoardCellColor boardCellColor) {
 
         this.gc = gc;
-        this.firstPlayer = firstPlayer;
-        this.secondPlayer = secondPlayer;
+        this.firstPlayer = playerUp;
+        this.secondPlayer = playerDown;
         this.firstPlayerCheckerColor = firstPlayerCheckerColor;
         this.secondPlayerCheckerColor = secondPlayerCheckerColor;
 
@@ -45,32 +46,47 @@ public class Game {
                 secondPlayerCheckerColor,
                 boardCellColor);
 
-        this.currentPlayer = null;
+        this.currentPlayer = playerDown;
 
         // The game has not started yet
-        this.currentGameState = GameState.IDLE;
+        this.currentGameState = GameState.PLAYER_TURN;
+//        this.currentGameState = GameState.IDLE;
     }
 
     public void processMousePress(Vector2d position) {
-//        final boolean isCheckerNowSelected = board.selectChecker(position);
-
-        if (!board.isCheckerSelected()) {
-            final boolean isCheckerNowSelected = board.selectChecker(position);
-        } else {
-            // A checker is already selected, try to make a move now
-            System.out.println(board.isMovePossibleWithSelectedChecker(position) ? "possible" : "wrong");
-            board.deselectChecker();
-        }
-
-
         switch (currentGameState) {
             case PLAYER_TURN:
-                // Select a checker or make the move
+                if (!currentPlayer.isHuman()) {
+                    // Don't allow mouse events while a computer is making move
+                    return;
+                }
 
+                final Vector2i newPosition = board.convertPositionToVector2i(position);
+
+                // Select a checker or make the move
+                if (!board.isCheckerSelected()) {
+                    final boolean isCheckerNowSelected = board.selectChecker(newPosition);
+                } else {
+                    // A checker is already selected, try to make a move now
+                    final boolean moveValid = board.isMovePossibleWithSelectedChecker(newPosition);
+                    System.out.println(moveValid ? "possible" : "wrong");
+
+                    if (moveValid) {
+                        // Move
+                        board.moveSelectedChecker(newPosition);
+                    } else {
+                        board.deselectChecker();
+                    }
+                }
 
                 break;
             case IDLE:
+                currentGameState = GameState.PLAYER_TURN;
+                break;
+            case TRANSITION:
 
+                break;
+            default:
         }
     }
 

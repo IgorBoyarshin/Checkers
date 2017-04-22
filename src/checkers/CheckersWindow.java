@@ -5,6 +5,7 @@ import checkers.board.BoardCellColor;
 import checkers.checker.CheckerColor;
 import checkers.players.ComputerPlayer;
 import checkers.players.HumanPlayer;
+import checkers.players.PlayerSide;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -70,8 +71,8 @@ public class CheckersWindow extends Application {
         Game game = new Game(
                 gc,
                 8,
-                new HumanPlayer(),
-                new ComputerPlayer(),
+                new HumanPlayer(PlayerSide.PLAYER_DOWN),
+                new HumanPlayer(PlayerSide.PLAYER_UP),
                 CheckerColor.WHITE,
                 CheckerColor.BLACK,
                 BoardCellColor.BROWN);
@@ -94,6 +95,7 @@ public class CheckersWindow extends Application {
 
                 // TODO: consider keeping the gc as a local field in the Game class(set in the constructor)
                 game.render(secondsSinceStart);
+                game.update(secondsSinceStart);
             }
         };
 

@@ -58,12 +58,12 @@ public class Board {
             initializeBoardFromArray(new int[][]
                     {
                             {0, 0, 0, 0, 0, 0, 0, 0},
-                            {0, 0, 1, 0, 1, 0, 0, 0},
-                            {0, 0, 0, -2, 0, 0, 0, 0},
+                            {0, 0, 1, 0, 0, 0, 0, 0},
+                            {0, 0, 0, -2, 0, 1, 0, 0},
                             {0, 0, 0, 0, 0, 0, 0, 0},
                             {0, 1, 0, 0, 0, 1, 0, 0},
                             {0, 0, 1, 0, 2, 0, 0, 0},
-                            {0, 0, 0, 0, 0, 0, 0, 0},
+                            {0, 0, 0, 1, 0, 0, 0, 0},
                             {0, 0, 0, 0, 0, 0, 0, 0}
                     });
 
@@ -172,7 +172,9 @@ public class Board {
     public void update(double secondsSinceStart) {
         for (Checker[] checkersRow : board) {
             for (Checker checker : checkersRow) {
-                checker.update(secondsSinceStart);
+                if (checker != null) {
+                    checker.update(secondsSinceStart);
+                }
             }
         }
     }
@@ -183,13 +185,13 @@ public class Board {
      * and removes any selection otherwise.
      * If the position is not valid, returns the previous state.
      *
-     * @param position the position on the board where the selection should happen
+     * @param checkerPosition the position on the board where the selection should happen
      * @return whether any checker is selected after performing this operation
      */
-    public boolean selectChecker(Vector2d position) {
-        final double cellSize = CheckersSettings.getInstance().cellSize;
+    public boolean selectChecker(Vector2i checkerPosition) {
+//        final double cellSize = CheckersSettings.getInstance().cellSize;
         // Convert position into Vector2i
-        final Vector2i checkerPosition = new Vector2i((int) (position.x / cellSize), (int) (position.y / cellSize));
+//        final Vector2i checkerPosition = new Vector2i((int) (position.x / cellSize), (int) (position.y / cellSize));
 
         final Checker checker = getChecker(checkerPosition);
         final Checker previouslySelectedChecker = getChecker(positionOfSelectedChecker);
@@ -254,6 +256,30 @@ public class Board {
      */
     public boolean isCheckerSelected() {
         return positionOfSelectedChecker != null;
+    }
+
+    /**
+     * Moves the selected Checker into the specified location.
+     * Deselects the Checker immediately
+     *
+     * @param newPosition the position into which the Checker must move
+     */
+    public void moveSelectedChecker(Vector2i newPosition) {
+        final Checker selectedChecker = getChecker(positionOfSelectedChecker);
+        if (selectedChecker == null) {
+            return;
+        }
+
+        selectedChecker.move(newPosition);
+        board[positionOfSelectedChecker.x][positionOfSelectedChecker.y] = null;
+        board[newPosition.x][newPosition.y] = selectedChecker;
+
+        // Deselect manually
+        // TODO: do with a method
+        selectedChecker.deselect();
+        positionOfSelectedChecker = null;
+
+//        deselectChecker();
     }
 
     /**
@@ -347,16 +373,6 @@ public class Board {
         return true;
     }
 
-    /**
-     * Checks whether the selected checker is allowed to move into the specified cell.
-     *
-     * @return true if a checker is selected and it is allowed to move into the specified cell,
-     * false otherwise.
-     */
-    public boolean isMovePossibleWithSelectedChecker(Vector2d newPosition) {
-        return isMovePossibleWithSelectedChecker(convertToVector2i(newPosition));
-    }
-
     public boolean canSelectedCheckerEat() {
         final Checker checker = getChecker(positionOfSelectedChecker);
         if (checker != null) { // if a checker is selected
@@ -433,7 +449,7 @@ public class Board {
      * @param position the position on the board stored in Vector2d.
      * @return position on the board stored in Vector2i.
      */
-    private Vector2i convertToVector2i(Vector2d position) {
+    public Vector2i convertPositionToVector2i(Vector2d position) {
         final double cellSize = CheckersSettings.getInstance().cellSize;
         return new Vector2i((int) (position.x / cellSize), (int) (position.y / cellSize));
     }
