@@ -1,27 +1,23 @@
-import game.Game;
-import game.board.BoardCellColor;
-import game.checker.CheckerColor;
-import game.players.ComputerPlayer;
-import game.players.HumanPlayer;
+package checkers;
+
+import checkers.game.Game;
+import checkers.board.BoardCellColor;
+import checkers.checker.CheckerColor;
+import checkers.players.ComputerPlayer;
+import checkers.players.HumanPlayer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import util.Vector2d;
+import checkers.util.Vector2d;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 /**
  * Created by Igorek on 09-Apr-17 at 8:12 AM.
@@ -30,16 +26,23 @@ public class CheckersWindow extends Application {
 
     private Stage window;
 
-    private final String WINDOW_TITLE = "Checkers";
-    private final int WINDOW_HEIGHT = 600;
-    private final int WINDOW_WIDTH = 900;
-
-    private final double CANVAS_SIZE = 500.0;
+    private CheckersSettings checkersSettings;
 
     @Override
     public void start(Stage primaryStage) {
         // For easy reference
         this.window = primaryStage;
+
+        final int boardSizeInCells = 8;
+        final double boardSizeInPixels = 500.0;
+        this.checkersSettings = new CheckersSettings(
+                "Checkers",
+                900,
+                600,
+                boardSizeInPixels,
+//                boardSizeInCells,
+                boardSizeInPixels / boardSizeInCells,
+                true);
 
         Parent root;
         try {
@@ -50,26 +53,23 @@ public class CheckersWindow extends Application {
             return;
         }
 
-        window.setTitle(WINDOW_TITLE);
-        window.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
+        window.setTitle(checkersSettings.windowTitle);
+        window.setScene(new Scene(root, checkersSettings.windowWidth, checkersSettings.windowHeight));
 
         // What to do when the user closes the window
         window.setOnCloseRequest((event) -> terminate());
 
-
-
         // Add a canvas to the scene
-        final Canvas canvas = new Canvas(CANVAS_SIZE, CANVAS_SIZE);
+        final Canvas canvas = new Canvas(checkersSettings.boardSizeInPixels, checkersSettings.boardSizeInPixels);
         ((BorderPane) root).setCenter(canvas);
 
         // Thing we will we drawing with
         final GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        // TODO: place default parameters somewhere else
+        // TODO: place parameters into CheckersSettings
         Game game = new Game(
                 gc,
                 8,
-                CANVAS_SIZE,
                 new HumanPlayer(),
                 new ComputerPlayer(),
                 CheckerColor.WHITE,

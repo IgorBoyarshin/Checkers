@@ -1,4 +1,4 @@
-package game.position;
+package checkers.position;
 
 /**
  * This enumeration describes possible movement speeds for a Checker.

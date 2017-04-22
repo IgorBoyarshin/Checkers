@@ -1,4 +1,4 @@
-package game.board;
+package checkers.board;
 
 import javafx.scene.paint.Color;
 

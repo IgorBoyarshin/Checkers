@@ -1,6 +1,6 @@
-package game.position;
+package checkers.position;
 
-import util.Vector2d;
+import checkers.util.Vector2d;
 
 /**
  * This interface describes the common methods that each type of position should have.

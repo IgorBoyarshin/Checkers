@@ -1,6 +1,6 @@
-package game.position;
+package checkers.position;
 
-import util.Vector2d;
+import checkers.util.Vector2d;
 
 /**
  * Created by Igorek on 09-Apr-17 at 9:10 AM.

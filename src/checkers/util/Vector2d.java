@@ -1,4 +1,4 @@
-package util;
+package checkers.util;
 
 /**
  * Created by Igorek on 09-Apr-17 at 9:02 AM.

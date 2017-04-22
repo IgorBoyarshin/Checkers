@@ -1,7 +1,8 @@
-package game.position;
+package checkers.position;
 
-import util.Vector2d;
-import util.Vector2i;
+import checkers.CheckersSettings;
+import checkers.util.Vector2d;
+import checkers.util.Vector2i;
 
 /**
  * This class describes a cell position that is restricted to the cells' grid,
@@ -11,13 +12,11 @@ import util.Vector2i;
  */
 public class BoardPosition implements Positionable {
 
-    private final double cellSize;
     private Vector2i boardPosition;
     private Vector2d actualPosition;
 
-    public BoardPosition(Vector2i boardPosition, double cellSize) {
+    public BoardPosition(Vector2i boardPosition) {
         this.boardPosition = boardPosition;
-        this.cellSize = cellSize;
 
         recalculateActualPosition();
     }
@@ -32,6 +31,7 @@ public class BoardPosition implements Positionable {
     }
 
     private void recalculateActualPosition() {
+        final double cellSize = CheckersSettings.getInstance().cellSize;
         this.actualPosition = new Vector2d(boardPosition.x * cellSize, boardPosition.y * cellSize);
     }
 

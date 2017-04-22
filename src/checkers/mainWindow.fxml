@@ -6,7 +6,7 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.canvas.Canvas?>
-<BorderPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersWindow">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="checkers.CheckersWindow">
     <top>
         <!--<MenuBar BorderPane.alignment="CENTER">-->
         <!--<menus>-->

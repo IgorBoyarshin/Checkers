@@ -1,11 +1,13 @@
-package game;
+package checkers.game;
 
-import game.board.Board;
-import game.board.BoardCellColor;
-import game.checker.CheckerColor;
-import game.players.Player;
+import checkers.CheckersSettings;
+import checkers.board.Board;
+import checkers.board.BoardCellColor;
+import checkers.checker.Checker;
+import checkers.checker.CheckerColor;
+import checkers.players.Player;
 import javafx.scene.canvas.GraphicsContext;
-import util.Vector2d;
+import checkers.util.Vector2d;
 
 /**
  * Created by Igorek on 09-Apr-17 at 8:49 AM.
@@ -26,7 +28,7 @@ public class Game {
 
     public Game(
             GraphicsContext gc,
-            int boardSizeInCells, double boardSizeInPixels,
+            int boardSizeInCells,
             Player firstPlayer, Player secondPlayer,
             CheckerColor firstPlayerCheckerColor, CheckerColor secondPlayerCheckerColor,
             BoardCellColor boardCellColor) {
@@ -37,8 +39,11 @@ public class Game {
         this.firstPlayerCheckerColor = firstPlayerCheckerColor;
         this.secondPlayerCheckerColor = secondPlayerCheckerColor;
 
-        this.board = new Board(boardSizeInCells, boardSizeInPixels,
-                firstPlayerCheckerColor, secondPlayerCheckerColor, boardCellColor);
+        this.board = new Board(
+                boardSizeInCells,
+                firstPlayerCheckerColor,
+                secondPlayerCheckerColor,
+                boardCellColor);
 
         this.currentPlayer = null;
 
@@ -47,13 +52,20 @@ public class Game {
     }
 
     public void processMousePress(Vector2d position) {
-        final boolean isCheckerNotSelected = board.selectChecker(position);
+//        final boolean isCheckerNowSelected = board.selectChecker(position);
+
+        if (!board.isCheckerSelected()) {
+            final boolean isCheckerNowSelected = board.selectChecker(position);
+        } else {
+            // A checker is already selected, try to make a move now
+            System.out.println(board.isMovePossibleWithSelectedChecker(position) ? "possible" : "wrong");
+            board.deselectChecker();
+        }
+
 
         switch (currentGameState) {
             case PLAYER_TURN:
                 // Select a checker or make the move
-
-
 
 
                 break;

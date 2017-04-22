@@ -1,11 +1,12 @@
-package game.checker;
+package checkers.checker;
 
-import game.players.PlayerSide;
-import game.position.BoardPosition;
-import game.position.Positionable;
+import checkers.CheckersSettings;
+import checkers.players.PlayerSide;
+import checkers.position.BoardPosition;
+import checkers.position.Positionable;
 import javafx.scene.canvas.GraphicsContext;
-import util.Vector2d;
-import util.Vector2i;
+import checkers.util.Vector2d;
+import checkers.util.Vector2i;
 
 /**
  * Created by Igorek on 09-Apr-17 at 8:50 AM.
@@ -23,14 +24,13 @@ public class Checker {
 
     private final DrawingConstants dc;
 
-    public Checker(CheckerColor color, PlayerSide playerSide, Vector2i boardPosition, double cellSize) {
+    public Checker(CheckerColor color, PlayerSide playerSide, Vector2i boardPosition) {
         this.color = color;
         this.playerSide = playerSide;
         this.queen = false;
-//        this.cellSize = cellSize;
 
-        this.position = new BoardPosition(boardPosition, cellSize);
-        this.dc = new DrawingConstants(cellSize);
+        this.position = new BoardPosition(boardPosition);
+        this.dc = new DrawingConstants();
     }
 
     public void draw(GraphicsContext gc) {
@@ -53,15 +53,17 @@ public class Checker {
         gc.fillOval(upperLeftCheckerCorner.x, upperLeftCheckerCorner.y, dc.checkerSize, dc.checkerSize);
 
         // Checker decorations
-        gc.setStroke(color.secondaryColor);
-        gc.strokeOval(
-                upperLeftCheckerCorner.x + dc.firstInnerCircleShiftFromChecker,
-                upperLeftCheckerCorner.y + dc.firstInnerCircleShiftFromChecker,
-                dc.firstInnerCircleSize, dc.firstInnerCircleSize);
-        gc.strokeOval(
-                upperLeftCheckerCorner.x + dc.secondInnerCircleShiftFromChecker,
-                upperLeftCheckerCorner.y + dc.secondInnerCircleShiftFromChecker,
-                dc.secondInnerCircleSize, dc.secondInnerCircleSize);
+        if (!queen) {
+            gc.setStroke(color.secondaryColor);
+            gc.strokeOval(
+                    upperLeftCheckerCorner.x + dc.firstInnerCircleShiftFromChecker,
+                    upperLeftCheckerCorner.y + dc.firstInnerCircleShiftFromChecker,
+                    dc.firstInnerCircleSize, dc.firstInnerCircleSize);
+            gc.strokeOval(
+                    upperLeftCheckerCorner.x + dc.secondInnerCircleShiftFromChecker,
+                    upperLeftCheckerCorner.y + dc.secondInnerCircleShiftFromChecker,
+                    dc.secondInnerCircleSize, dc.secondInnerCircleSize);
+        }
     }
 
     public void update(double secondsSinceStart) {
@@ -102,8 +104,15 @@ public class Checker {
         return playerSide;
     }
 
+    public boolean isCheckerDirectionUp() {
+        return playerSide.equals(PlayerSide.PLAYER_DOWN);
+    }
+
+
     private class DrawingConstants {
-        private DrawingConstants(double cellSize) {
+        private DrawingConstants() {
+            final double cellSize = CheckersSettings.getInstance().cellSize;
+
             // Checker itself
             final double checkerSizeMultiplier = 0.7; // checker's size relative to cell's size
             this.checkerSize = cellSize * checkerSizeMultiplier;
