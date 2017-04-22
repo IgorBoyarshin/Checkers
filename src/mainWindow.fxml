@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.canvas.Canvas?>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CheckersWindow">
+    <top>
+        <!--<MenuBar BorderPane.alignment="CENTER">-->
+        <!--<menus>-->
+        <!--<Menu mnemonicParsing="false" text="Main menu">-->
+        <!--<items>-->
+        <!--<MenuItem mnemonicParsing="false" onAction="#processInputWindow" text="Graph input" />-->
+        <!--<MenuItem mnemonicParsing="false" onAction="#processOperationsWindow" text="Operations" />-->
+        <!--</items>-->
+        <!--</Menu>-->
+        <!--</menus>-->
+        <!--</MenuBar>-->
+    </top>
+    <bottom>
+        <!--<Label fx:id="infoLabel" BorderPane.alignment="CENTER">-->
+        <!--<font>-->
+        <!--<Font size="14.0" />-->
+        <!--</font>-->
+        <!--<BorderPane.margin>-->
+        <!--<Insets bottom="10.0" />-->
+        <!--</BorderPane.margin>-->
+        <!--</Label>-->
+    </bottom>
+    <!--<Canvas fx:id="canvas"/>-->
+        <!--<VBox alignment="TOP_CENTER" spacing="10.0" BorderPane.alignment="CENTER">-->
+            <!--<children>-->
+                <!--<Label text="dsg">-->
+                        <!--</Label>-->
+            <!--</children>-->
+            <!--<padding>-->
+                <!--<Insets bottom="10.0" left="20.0" right="20.0" top="10.0"/>-->
+            <!--</padding>-->
+        <!--</VBox>-->
+</BorderPane>
