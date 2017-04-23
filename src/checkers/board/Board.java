@@ -38,6 +38,11 @@ public class Board {
 
     private Checker checkerToDrawOnTop;
 
+    // TODO: consider having only positionOfDyingChecker variable
+    private Checker dyingChecker;
+
+    private Vector2i positionOfDyingChecker;
+
     public Board(
             int boardSizeInCells,
             CheckerColor firstPlayerCheckerColor, CheckerColor secondPlayerCheckerColor,
@@ -54,6 +59,8 @@ public class Board {
 
         this.positionOfSelectedChecker = null;
         this.checkerToDrawOnTop = null;
+        this.dyingChecker = null;
+        this.positionOfDyingChecker = null;
     }
 
     private void initializeBoard() {
@@ -172,7 +179,7 @@ public class Board {
             }
         }
 
-        // Draw the selected Checker, so that it is always on top(while moving)
+        // Draw the selected Checker the last, so that it is always on top(while moving)
         if (checkerToDrawOnTop != null) {
             checkerToDrawOnTop.draw(gc);
         }
@@ -185,6 +192,13 @@ public class Board {
                     checker.update(secondsSinceStart);
                 }
             }
+        }
+
+        if (dyingChecker != null && dyingChecker.hasDied()) {
+            board[positionOfDyingChecker.x][positionOfDyingChecker.y] = null; // Remove the Checker that has died
+
+            this.dyingChecker = null;
+            this.positionOfDyingChecker = null;
         }
     }
 
@@ -270,9 +284,11 @@ public class Board {
 
     /**
      * Moves the selected Checker into the specified location.
-     * Deselects the Checker immediately
+     * Deselects the Checker immediately.
+     * Expects the move to be valid(does not check validness).
      *
-     * @param newPosition the position into which the Checker must move
+     * @param newPosition the position into which the Checker must move.
+     * @return the Checker that the selected Checker eats(if any) as the result of its move, null otherwise.
      */
     public void moveSelectedChecker(Vector2i newPosition) {
         final Checker selectedChecker = getChecker(positionOfSelectedChecker);
@@ -280,6 +296,23 @@ public class Board {
             return;
         }
 
+        // Retrieve the Checker that the selected Checker eats(if any)
+        final Vector2i delta = new Vector2i(
+                newPosition.x - positionOfSelectedChecker.x,
+                newPosition.y - positionOfSelectedChecker.y);
+        final int moveLength = Math.abs(delta.x); // == abs(delta.y)
+        final Vector2i positionOfCheckerToEat =
+                new Vector2i(newPosition.x - delta.x / moveLength, newPosition.y - delta.y / moveLength);
+        // If it is us => don't eat us : )
+        final Checker checkerToEat =
+                (moveLength == 1) ? null : board[positionOfCheckerToEat.x][positionOfCheckerToEat.y];
+        if (checkerToEat != null) {
+            this.positionOfDyingChecker = positionOfCheckerToEat;
+            this.dyingChecker = checkerToEat;
+            checkerToEat.die();
+        }
+
+        // Move the selected Checker on the board
         selectedChecker.move(newPosition);
         board[positionOfSelectedChecker.x][positionOfSelectedChecker.y] = null;
         board[newPosition.x][newPosition.y] = selectedChecker;
@@ -475,5 +508,18 @@ public class Board {
         } catch (NullPointerException e) {
             return false;
         }
+    }
+
+    public int getAmountOfCheckersOnBoard() {
+        int amount = 0;
+        for (Checker[] checkersRow : board) {
+            for (Checker checker : checkersRow) {
+                if (checker != null) {
+                    amount++;
+                }
+            }
+        }
+
+        return amount;
     }
 }

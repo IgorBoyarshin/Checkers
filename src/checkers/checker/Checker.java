@@ -9,6 +9,7 @@ import checkers.position.Positionable;
 import javafx.scene.canvas.GraphicsContext;
 import checkers.util.Vector2d;
 import checkers.util.Vector2i;
+import javafx.scene.paint.Color;
 
 /**
  * Created by Igorek on 09-Apr-17 at 8:50 AM.
@@ -26,6 +27,15 @@ public class Checker {
 
     private final DrawingConstants dc;
 
+    private boolean dying;
+
+    /**
+     * The time when the dying started(in seconds).
+     */
+    private double dyingTimeStart;
+
+    private double dyingProgress;
+
     public Checker(CheckerColor color, PlayerSide playerSide, Vector2i boardPosition) {
         this.color = color;
         this.playerSide = playerSide;
@@ -33,6 +43,9 @@ public class Checker {
 
         this.position = new BoardPosition(boardPosition);
         this.dc = new DrawingConstants();
+        this.dying = false;
+        this.dyingTimeStart = 0.0;
+        this.dyingProgress = 0.0;
     }
 
     public void draw(GraphicsContext gc) {
@@ -51,12 +64,14 @@ public class Checker {
         }
 
         // Checker background(main volume)
-        gc.setFill(color.primaryColor);
+        final Color fillColor = color.primaryColor.interpolate(dc.transparentColor, dyingProgress);
+        gc.setFill(fillColor);
         gc.fillOval(upperLeftCheckerCorner.x, upperLeftCheckerCorner.y, dc.checkerSize, dc.checkerSize);
 
         // Checker decorations
         if (!queen) {
-            gc.setStroke(color.secondaryColor);
+            final Color strokeColor = color.secondaryColor.interpolate(dc.transparentColor, dyingProgress);
+            gc.setStroke(strokeColor);
             gc.strokeOval(
                     upperLeftCheckerCorner.x + dc.firstInnerCircleShiftFromChecker,
                     upperLeftCheckerCorner.y + dc.firstInnerCircleShiftFromChecker,
@@ -70,6 +85,21 @@ public class Checker {
 
     public void update(double secondsSinceStart) {
         position.update(secondsSinceStart);
+
+        if (dying) {
+            if (dyingTimeStart == 0.0) {
+                // If we must start dying, but the dyingTimeStart has not been initialized yet => initialize it
+                dyingTimeStart = secondsSinceStart;
+            }
+
+            final double dyingDuration = CheckersSettings.getInstance().movementSpeed.durationInSeconds;
+            dyingProgress = (secondsSinceStart - dyingTimeStart) / dyingDuration;
+
+            if (dyingProgress >= 1.0) {
+                // We will be deleted in the board class
+                dyingProgress = 1.0;
+            }
+        }
 
         if (this.position instanceof MovingPosition) {
             final MovingPosition movingPosition = (MovingPosition) this.position;
@@ -106,6 +136,18 @@ public class Checker {
         selected = !selected;
 
         return selected;
+    }
+
+    public boolean isDying() {
+        return dying;
+    }
+
+    public void die() {
+        dying = true;
+    }
+
+    public boolean hasDied() {
+        return dyingProgress >= 1.0;
     }
 
     public boolean isQueen() {
@@ -146,6 +188,9 @@ public class Checker {
             final double selectionSizeMultiplier = 1.2; // selection's size relative to checker's size
             this.selectionSize = checkerSize * selectionSizeMultiplier;
             this.selectionShiftFromChecker = (checkerSize - selectionSize) / 2.0; // Will be negative
+
+            // Dying
+            this.transparentColor = Color.rgb(255, 255, 255, 0.0);
         }
 
         private final double checkerShiftFromCell;
@@ -158,5 +203,7 @@ public class Checker {
 
         private final double selectionSize;
         private final double selectionShiftFromChecker;
+
+        private final Color transparentColor;
     }
 }

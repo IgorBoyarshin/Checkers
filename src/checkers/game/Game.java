@@ -78,16 +78,12 @@ public class Game {
                 } else {
                     // A checker is already selected, try to make a move now
                     final boolean moveValid = board.isMovePossibleWithSelectedChecker(newPosition);
-//                    System.out.println(moveValid ? "possible" : "wrong");
-
                     if (moveValid) {
                         // Move
                         board.moveSelectedChecker(newPosition);
 
                         // Switch current GameState
-//                        final double ONE_BILLION = 1000000000.0;
-//                        transitionTimeStart = System.nanoTime() / ONE_BILLION;
-                        transitionTimeStart = 0.0; // TODO: consider not needed(is set in update())
+                        transitionTimeStart = 0.0; // TODO: consider the assignment not needed(is set anyway in update())
                         this.currentGameState = GameState.TRANSITION;
                     } else {
                         board.deselectChecker();
