@@ -56,7 +56,6 @@ public class Game {
         this.currentPlayer = playerDown;
 
         // The game has not started yet
-//        this.currentGameState = GameState.PLAYER_TURN;
         this.currentGameState = GameState.IDLE;
 
         this.transitionTimeStart = 0.0;

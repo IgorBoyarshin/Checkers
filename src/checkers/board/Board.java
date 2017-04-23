@@ -386,7 +386,7 @@ public class Board {
             switch (moveLength) {
                 case 1: // Just move
                     // We can move only forward
-                    if (Math.signum(delta.y) != Math.signum(selectedChecker.getPlayerSide().forwardDirectionY)) {
+                    if (!selectedChecker.isMovementDirectionAllowed(delta.y)) {
                         // Given movement direction is wrong => invalid move
                         return false;
                     }
@@ -407,7 +407,7 @@ public class Board {
         }
 
         if (checkerEats) {
-            if (doCheckersBelongToTheSamePlayer(selectedChecker, potentialCheckerToEat)) {
+            if (Checker.doCheckersBelongToTheSamePlayer(selectedChecker, potentialCheckerToEat)) {
                 // If the Checkers belong to the same Player => can't eat => invalid move
                 return false;
             }
@@ -422,12 +422,66 @@ public class Board {
     }
 
     public boolean canSelectedCheckerEat() {
-        final Checker checker = getChecker(positionOfSelectedChecker);
-        if (checker != null) { // if a checker is selected
-            if (checker.isQueen()) {
+        final Checker selectedChecker = getChecker(positionOfSelectedChecker);
+        if (selectedChecker == null) { // if a checker is not selected
+            return false;
+        }
 
-            } else { // not a queen
+        // Strategy:
+        // Go in all 4 diagonal directions(allowed movement length is determined by being a queen).
+        // If a Checker of the same PlayerSide is found => can't eat in that direction.
+        // If a Checker of the opposite PlayerSide is found =>
+        // => can eat if the distance to it is correct(queen or not) and if the cell after this Checker is empty
 
+        // How much cells we can move before we must encounter a Checker to eat
+        // (before we are in the cell where that Checker is).
+        final int allowedMoveLengthUntilEating;
+        if (selectedChecker.isQueen()) {
+            allowedMoveLengthUntilEating = boardSizeInCells - 1; // minus our cell
+        } else { // not a queen
+            allowedMoveLengthUntilEating = 1;
+        }
+
+        // Cycle for all 4 diagonal directions
+        for (int deltaX = -1; deltaX <= +1; deltaX += 2) {
+            for (int deltaY = -1; deltaY <= +1; deltaY += 2) {
+                final Vector2i currentPosition = positionOfSelectedChecker.clone();
+                Checker checkerToEat = null;
+
+                // Moving in that direction
+                for (int currentMoveLength = 0; currentMoveLength < allowedMoveLengthUntilEating; currentMoveLength++) {
+                    currentPosition.x += deltaX;
+                    currentPosition.y += deltaY;
+
+                    if (!isPositionValid(currentPosition)) {
+                        // If we went outside the board => found nobody
+                        break;
+                    }
+
+                    checkerToEat = getChecker(currentPosition);
+                    if (checkerToEat != null) {
+                        // Found someone => stop moving
+                        break;
+                    }
+                }
+
+                // Finished moving
+                if (checkerToEat != null) {
+                    // Found someone
+                    if (Checker.doCheckersBelongToTheSamePlayer(checkerToEat, selectedChecker)) {
+                        // Can't eat because the Checkers belong to the same Player
+                        continue;
+                    } else {
+                        // Make one more step
+                        currentPosition.x += deltaX;
+                        currentPosition.y += deltaY;
+
+                        if (isPositionValid(currentPosition) && getChecker(currentPosition) == null) {
+                            // The cell after the found Checker is within the board and is empty => can more there
+                            return true;
+                        }
+                    }
+                }
             }
         }
 
@@ -491,6 +545,15 @@ public class Board {
     }
 
     /**
+     * Checks if the specified position is within the board bounds.
+     *
+     * @return true is the specified position os a valid board address, false otherwise.
+     */
+    private boolean isPositionValid(Vector2i position) {
+        return (position.x >= 0 && position.x < boardSizeInCells) && (position.y >= 0 && position.y < boardSizeInCells);
+    }
+
+    /**
      * Converts the given Vector2d into Vector2i by dividing by cellSize.
      * Expects the given vector to be a position on the board.
      *
@@ -500,14 +563,6 @@ public class Board {
     public Vector2i convertPositionToVector2i(Vector2d position) {
         final double cellSize = CheckersSettings.getInstance().cellSize;
         return new Vector2i((int) (position.x / cellSize), (int) (position.y / cellSize));
-    }
-
-    private boolean doCheckersBelongToTheSamePlayer(Checker checker1, Checker checker2) {
-        try {
-            return checker1.getPlayerSide().equals(checker2.getPlayerSide());
-        } catch (NullPointerException e) {
-            return false;
-        }
     }
 
     public int getAmountOfCheckersOnBoard() {

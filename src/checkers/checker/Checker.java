@@ -158,8 +158,26 @@ public class Checker {
         queen = true;
     }
 
-    public PlayerSide getPlayerSide() {
-        return playerSide;
+//    public PlayerSide getPlayerSide() {
+//        return playerSide;
+//    }
+
+    /**
+     * Checks whether the specified movement direction(movement delta along Y axis) is the same as
+     * allowed movement direction(specified in PlayerSide.forwardDirectionY).
+     *
+     * @return whether this Checker can move in the specified direction along Y axis.
+     */
+    public boolean isMovementDirectionAllowed(double deltaY) {
+        return Math.signum(deltaY) == Math.signum(playerSide.forwardDirectionY);
+    }
+
+    public static boolean doCheckersBelongToTheSamePlayer(Checker checker1, Checker checker2) {
+        try {
+            return checker1.playerSide.equals(checker2.playerSide);
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     public boolean isCheckerDirectionUp() {

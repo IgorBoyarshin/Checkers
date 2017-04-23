@@ -9,7 +9,7 @@ public enum PlayerSide {
 
     /**
      * Single step along Y axis which indicates the direction of forward movement.
-     * If forward movement is DOWN then this value is +1, otheewise it is -1.
+     * If forward movement is DOWN then this value is +1, otherwise it is -1.
      */
     public final int forwardDirectionY;
 

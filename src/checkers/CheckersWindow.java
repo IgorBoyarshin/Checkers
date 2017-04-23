@@ -44,8 +44,8 @@ public class CheckersWindow extends Application {
                 boardSizeInPixels,
 //                boardSizeInCells,
                 boardSizeInPixels / boardSizeInCells,
-                true,
-                MovementSpeed.SLOW);
+                false,
+                MovementSpeed.FAST);
 
         Parent root;
         try {
