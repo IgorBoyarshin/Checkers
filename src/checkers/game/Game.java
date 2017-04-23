@@ -27,6 +27,13 @@ public class Game {
 
     private Player currentPlayer;
 
+    /**
+     * The time in seconds when the transition(Checker movement) started.
+     * Is used to determine when to switch the GameState.
+     * Transition should take exactly CheckersSettings.getInstance().movementSpeed.durationInSeconds seconds.
+     */
+    private double transitionTimeStart;
+
     public Game(
             GraphicsContext gc,
             int boardSizeInCells,
@@ -49,8 +56,10 @@ public class Game {
         this.currentPlayer = playerDown;
 
         // The game has not started yet
-        this.currentGameState = GameState.PLAYER_TURN;
-//        this.currentGameState = GameState.IDLE;
+//        this.currentGameState = GameState.PLAYER_TURN;
+        this.currentGameState = GameState.IDLE;
+
+        this.transitionTimeStart = 0.0;
     }
 
     public void processMousePress(Vector2d position) {
@@ -69,11 +78,17 @@ public class Game {
                 } else {
                     // A checker is already selected, try to make a move now
                     final boolean moveValid = board.isMovePossibleWithSelectedChecker(newPosition);
-                    System.out.println(moveValid ? "possible" : "wrong");
+//                    System.out.println(moveValid ? "possible" : "wrong");
 
                     if (moveValid) {
                         // Move
                         board.moveSelectedChecker(newPosition);
+
+                        // Switch current GameState
+//                        final double ONE_BILLION = 1000000000.0;
+//                        transitionTimeStart = System.nanoTime() / ONE_BILLION;
+                        transitionTimeStart = 0.0; // TODO: consider not needed(is set in update())
+                        this.currentGameState = GameState.TRANSITION;
                     } else {
                         board.deselectChecker();
                     }
@@ -81,7 +96,7 @@ public class Game {
 
                 break;
             case IDLE:
-                currentGameState = GameState.PLAYER_TURN;
+
                 break;
             case TRANSITION:
 
@@ -94,6 +109,30 @@ public class Game {
      *
      */
     public void update(double secondsSinceStart) {
+        switch (currentGameState) {
+            case PLAYER_TURN:
+
+
+                break;
+            case TRANSITION:
+                if (transitionTimeStart == 0.0) { // We just got here
+                    transitionTimeStart = secondsSinceStart;
+                } else {
+                    // TODO: mb speed up by not accessing the constant each frame
+                    final double duration = CheckersSettings.getInstance().movementSpeed.durationInSeconds;
+                    if (secondsSinceStart - transitionTimeStart > duration) {
+                        // Transition has ended => switch the GameState
+                        this.currentGameState = GameState.PLAYER_TURN;
+                        this.transitionTimeStart = 0.0;
+                    }
+                }
+                break;
+            case IDLE:
+                currentGameState = GameState.PLAYER_TURN;
+                break;
+            default:
+        }
+
         board.update(secondsSinceStart);
     }
 

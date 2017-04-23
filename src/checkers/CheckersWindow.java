@@ -6,6 +6,7 @@ import checkers.checker.CheckerColor;
 import checkers.players.ComputerPlayer;
 import checkers.players.HumanPlayer;
 import checkers.players.PlayerSide;
+import checkers.position.MovementSpeed;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -43,7 +44,8 @@ public class CheckersWindow extends Application {
                 boardSizeInPixels,
 //                boardSizeInCells,
                 boardSizeInPixels / boardSizeInCells,
-                true);
+                true,
+                MovementSpeed.SLOW);
 
         Parent root;
         try {
@@ -112,7 +114,7 @@ public class CheckersWindow extends Application {
 ////        canvas.setHeight(CANVAS_SIZE);
 //    }
 
-    public void terminate() {
+    private void terminate() {
         window.close();
     }
 

@@ -83,7 +83,7 @@ public class Checker {
         this.position = new MovingPosition(
                 ((BoardPosition) this.position),
                 new BoardPosition(newPosition),
-                MovementSpeed.SLOW);
+                CheckersSettings.getInstance().movementSpeed);
     }
 
     public boolean isSelected() {

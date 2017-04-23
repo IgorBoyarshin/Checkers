@@ -1,5 +1,7 @@
 package checkers;
 
+import checkers.position.MovementSpeed;
+
 /**
  * Created by Igorek on 22-Apr-17 at 7:49 PM.
  */
@@ -14,16 +16,17 @@ public class CheckersSettings {
 
     public final boolean isEatingMandatory;
     public final double cellSize;
-//    public final double boardSizeInCells;
+    public final MovementSpeed movementSpeed;
 
-    protected CheckersSettings(
+    CheckersSettings(
             String windowTitle,
             int windowWidth,
             int windowHeight,
             double boardSizeInPixels,
 //            double boardSizeInCells,
             double cellSize,
-            boolean isEatingMandatory
+            boolean isEatingMandatory,
+            MovementSpeed movementSpeed
     ) {
         this.windowTitle = windowTitle;
         this.windowHeight = windowHeight;
@@ -31,7 +34,7 @@ public class CheckersSettings {
         this.boardSizeInPixels = boardSizeInPixels;
         this.isEatingMandatory = isEatingMandatory;
         this.cellSize = cellSize;
-//        this.boardSizeInCells = boardSizeInCells;
+        this.movementSpeed = movementSpeed;
 
         instance = this;
     }

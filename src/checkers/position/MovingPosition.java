@@ -3,6 +3,8 @@ package checkers.position;
 import checkers.util.Vector2d;
 import checkers.util.Vector2i;
 
+import java.util.function.Consumer;
+
 /**
  * Created by Igorek on 09-Apr-17 at 9:10 AM.
  */
@@ -54,6 +56,7 @@ public class MovingPosition implements Positionable {
         this.movementTimeStartInSeconds = 0.0;
 //        this.currentPosition = new Vector2d(positionStart.x, positionStart.y);
         this.currentPosition = positionStart.getActualPosition().clone();
+        this.completed = false;
     }
 
     /**
@@ -74,7 +77,6 @@ public class MovingPosition implements Positionable {
         if (movementTimeStartInSeconds == 0.0) {
             // Initialize if this is the first call
             this.movementTimeStartInSeconds = currentSecondsSinceStart;
-            this.completed = false;
         }
 
         final double movementProgress = (currentSecondsSinceStart - movementTimeStartInSeconds) / movementSpeed.durationInSeconds;
