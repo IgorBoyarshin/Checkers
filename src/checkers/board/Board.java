@@ -36,6 +36,8 @@ public class Board {
 
     private Vector2i positionOfSelectedChecker;
 
+    private Checker checkerToDrawOnTop;
+
     public Board(
             int boardSizeInCells,
             CheckerColor firstPlayerCheckerColor, CheckerColor secondPlayerCheckerColor,
@@ -51,6 +53,7 @@ public class Board {
         initializeBoard();
 
         this.positionOfSelectedChecker = null;
+        this.checkerToDrawOnTop = null;
     }
 
     private void initializeBoard() {
@@ -160,12 +163,18 @@ public class Board {
     }
 
     private void drawCheckers(GraphicsContext gc) {
+        // Draw all the Checkers
         for (Checker[] checkersRow : board) {
             for (Checker checker : checkersRow) {
-                if (checker != null) {
+                if (checker != null && !checker.equals(checkerToDrawOnTop)) {
                     checker.draw(gc);
                 }
             }
+        }
+
+        // Draw the selected Checker, so that it is always on top(while moving)
+        if (checkerToDrawOnTop != null) {
+            checkerToDrawOnTop.draw(gc);
         }
     }
 
@@ -238,6 +247,7 @@ public class Board {
      * @param position the position of the desired checker.
      * @return the checker at that position if the position is valid and there is a checker present, null otherwise.
      */
+    // TODO: check the frequency of exception. MB better to do a simple check
     private Checker getChecker(Vector2i position) {
         try {
             return board[position.x][position.y];
@@ -274,8 +284,13 @@ public class Board {
         board[positionOfSelectedChecker.x][positionOfSelectedChecker.y] = null;
         board[newPosition.x][newPosition.y] = selectedChecker;
 
+        // Set this Checker to be rendered on top.
+        // At any time there will be a not-null reference.
+        // This is OK because drawing order matters only during movement
+        checkerToDrawOnTop = selectedChecker;
+
         // Deselect manually
-        // TODO: do with a method
+        // TODO: do this with a method
         selectedChecker.deselect();
         positionOfSelectedChecker = null;
 
