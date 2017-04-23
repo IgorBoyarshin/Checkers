@@ -67,16 +67,16 @@ public class Board {
     }
 
     private void initializeBoard() {
-        if (false) {
+        if (true) {
             initializeBoardFromArray(new int[][]
                     {
                             {0, 0, 0, 0, 0, 0, 0, 0},
-                            {0, 0, 1, 0, 0, 0, 0, 0},
-                            {0, 0, 0, -2, 0, 1, 0, 0},
                             {0, 0, 0, 0, 0, 0, 0, 0},
-                            {0, 1, 0, 0, 0, 1, 0, 0},
-                            {0, 0, 1, 0, 2, 0, 0, 0},
-                            {0, 0, 0, 1, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0, 1, 0, 0},
+                            {0, 0, 1, 0, 0, 0, 2, 0},
+                            {0, 0, 0, 0, 0, 0, 0, 0},
+                            {0, 0, 1, 0, 0, 0, 0, 0},
+                            {0, 0, 0, 2, 0, 0, 0, 0},
                             {0, 0, 0, 0, 0, 0, 0, 0}
                     });
 
@@ -449,7 +449,7 @@ public class Board {
         return true;
     }
 
-    private boolean canCheckerEat(Vector2i position) {
+    public boolean canCheckerEat(Vector2i position) {
         final Checker checker = getChecker(position);
         if (checker == null) { // if a checker is not selected
             return false;

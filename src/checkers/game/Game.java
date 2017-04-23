@@ -38,6 +38,7 @@ public class Game {
     private boolean playerHasMoved;
     private boolean playerEatsThisTurn;
     private boolean haveCheckedAbilityToMoveThisTurn;
+    private Vector2i checkerOfLastMove;
 
     public Game(
             GraphicsContext gc,
@@ -68,6 +69,8 @@ public class Game {
         this.playerHasMoved = false;
         this.playerEatsThisTurn = false;
         this.haveCheckedAbilityToMoveThisTurn = false;
+
+        this.checkerOfLastMove = null;
     }
 
     public void processMousePress(Vector2d position) {
@@ -79,8 +82,13 @@ public class Game {
 
                     // Select a checker or make the move
                     if (!board.isCheckerSelected()) {
-                        final boolean isCheckerNowSelected =
-                                board.selectChecker(currentPlayer.getPlayerSide(), newPosition);
+                        // Allow selecting a Checker only if:
+                        // - this is the first move of the turn
+                        // - not first => we're eating => have to eat with the same Checker
+                        if (checkerOfLastMove == null || (checkerOfLastMove.equals(newPosition))) {
+                            final boolean isCheckerNowSelected =
+                                    board.selectChecker(currentPlayer.getPlayerSide(), newPosition);
+                        }
                     } else {
                         // A checker is already selected, try to make a move now
                         final boolean moveValid = board.isMovePossibleWithSelectedChecker(newPosition);
@@ -122,6 +130,7 @@ public class Game {
                         this.playerHasMoved = false;
                         this.playerEatsThisTurn = false;
                         this.haveCheckedAbilityToMoveThisTurn = false;
+                        this.checkerOfLastMove = null;
                     } else { // Player hasn't finished his turn yet
                         if (currentPlayer.isHuman()) {
                             final HumanPlayer humanPlayer = (HumanPlayer) currentPlayer;
@@ -137,7 +146,7 @@ public class Game {
                                     // Not allowed to make moves anymore => finish
                                     humanPlayer.forceTurnFinish();
                                 } else { // player already ate this turn
-                                    if (board.canPlayerEat(currentPlayer.getPlayerSide())) { // scenario {3}
+                                    if (board.canCheckerEat(checkerOfLastMove)) { // scenario {3}
                                         if (CheckersSettings.getInstance().isEatingMandatory) {
                                             // Wait for Player to make his move
                                         } else {
@@ -174,6 +183,7 @@ public class Game {
                     board.selectChecker(currentPlayer.getPlayerSide(), move.a);
                     final boolean ateSomeone = board.moveSelectedChecker(move.b);
 
+                    checkerOfLastMove = move.b;
                     playerHasMoved = true;
                     playerEatsThisTurn = playerEatsThisTurn || ateSomeone;
                 }
