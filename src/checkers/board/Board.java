@@ -8,6 +8,9 @@ import javafx.scene.canvas.GraphicsContext;
 import checkers.util.Vector2d;
 import checkers.util.Vector2i;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Created by Igorek on 09-Apr-17 at 8:50 AM.
  */
@@ -64,7 +67,7 @@ public class Board {
     }
 
     private void initializeBoard() {
-        if (true) {
+        if (false) {
             initializeBoardFromArray(new int[][]
                     {
                             {0, 0, 0, 0, 0, 0, 0, 0},
@@ -207,19 +210,25 @@ public class Board {
      * If the position is valid, flips the selection of the checker at that position if it is present,
      * and removes any selection otherwise.
      * If the position is not valid, returns the previous state.
+     * If the Checker does not belong to the specified PlayerSide, no selection is done.
      *
+     * @param playerSide      the PlayerSide to which the Checker must belong to in order to be able to select it
      * @param checkerPosition the position on the board where the selection should happen
      * @return whether any checker is selected after performing this operation
      */
-    public boolean selectChecker(Vector2i checkerPosition) {
-//        final double cellSize = CheckersSettings.getInstance().cellSize;
-        // Convert position into Vector2i
-//        final Vector2i checkerPosition = new Vector2i((int) (position.x / cellSize), (int) (position.y / cellSize));
-
+    // TODO: rewrite documentation
+    public boolean selectChecker(PlayerSide playerSide, Vector2i checkerPosition) {
         final Checker checker = getChecker(checkerPosition);
+        if (checker == null) {
+            return false;
+        }
+        if (!checker.belongsToThisPlayerSide(playerSide)) {
+            return false;
+        }
+
         final Checker previouslySelectedChecker = getChecker(positionOfSelectedChecker);
 
-        if (checker != null && checkerPosition.equals(positionOfSelectedChecker)) {
+        if (checkerPosition.equals(positionOfSelectedChecker)) {
             // If we clicked on the selected checker
             checker.deselect();
             positionOfSelectedChecker = null;
@@ -228,10 +237,9 @@ public class Board {
                 previouslySelectedChecker.deselect();
                 positionOfSelectedChecker = null;
             }
-            if (checker != null) {
-                checker.select();
-                positionOfSelectedChecker = checkerPosition;
-            }
+
+            checker.select();
+            positionOfSelectedChecker = checkerPosition;
         }
 
         return isCheckerSelected();
@@ -252,6 +260,21 @@ public class Board {
         }
 
         return wasSelected;
+    }
+
+    /**
+     * Returns a copy of the position of the selected Checker.
+     *
+     * @return a copy of the position of the selected Checker.
+     */
+    public Vector2i getPositionOfSelectedChecker() {
+        return positionOfSelectedChecker.clone();
+    }
+
+    public boolean doesCheckerBelongToThisPlayerSide(PlayerSide playerSide, Vector2i checkerPosition) {
+        final Checker checker = getChecker(checkerPosition);
+
+        return checker != null && checker.belongsToThisPlayerSide(playerSide);
     }
 
     /**
@@ -286,14 +309,15 @@ public class Board {
      * Moves the selected Checker into the specified location.
      * Deselects the Checker immediately.
      * Expects the move to be valid(does not check validness).
+     * Kill the Checker that this Checker eats(if any).
      *
      * @param newPosition the position into which the Checker must move.
-     * @return the Checker that the selected Checker eats(if any) as the result of its move, null otherwise.
+     * @return true if this Checker eats any Checker as the result of its move, false otherwise.
      */
-    public void moveSelectedChecker(Vector2i newPosition) {
+    public boolean moveSelectedChecker(Vector2i newPosition) {
         final Checker selectedChecker = getChecker(positionOfSelectedChecker);
         if (selectedChecker == null) {
-            return;
+            return false;
         }
 
         // Retrieve the Checker that the selected Checker eats(if any)
@@ -328,10 +352,13 @@ public class Board {
         positionOfSelectedChecker = null;
 
 //        deselectChecker();
+
+        return checkerToEat != null;
     }
 
     /**
      * Checks whether the selected checker is allowed to move into the specified cell.
+     * Will ban the move if (eating is mandatory && no eating during the move).
      *
      * @return true if a checker is selected and it is allowed to move into the specified cell,
      * false otherwise.
@@ -413,7 +440,8 @@ public class Board {
             }
         }
 
-        if (CheckersSettings.getInstance().isEatingMandatory && canSelectedCheckerEat() && !checkerEats) {
+//        System.out.println("Can eat: " + canSelectedCheckerEat());
+        if (CheckersSettings.getInstance().isEatingMandatory && !checkerEats && canPlayerEat(selectedChecker.getPlayerSide())) {
             // TODO: mb print into a Label that the move is banned due to not eating
             return false;
         }
@@ -421,9 +449,9 @@ public class Board {
         return true;
     }
 
-    public boolean canSelectedCheckerEat() {
-        final Checker selectedChecker = getChecker(positionOfSelectedChecker);
-        if (selectedChecker == null) { // if a checker is not selected
+    private boolean canCheckerEat(Vector2i position) {
+        final Checker checker = getChecker(position);
+        if (checker == null) { // if a checker is not selected
             return false;
         }
 
@@ -436,7 +464,7 @@ public class Board {
         // How much cells we can move before we must encounter a Checker to eat
         // (before we are in the cell where that Checker is).
         final int allowedMoveLengthUntilEating;
-        if (selectedChecker.isQueen()) {
+        if (checker.isQueen()) {
             allowedMoveLengthUntilEating = boardSizeInCells - 1; // minus our cell
         } else { // not a queen
             allowedMoveLengthUntilEating = 1;
@@ -445,7 +473,7 @@ public class Board {
         // Cycle for all 4 diagonal directions
         for (int deltaX = -1; deltaX <= +1; deltaX += 2) {
             for (int deltaY = -1; deltaY <= +1; deltaY += 2) {
-                final Vector2i currentPosition = positionOfSelectedChecker.clone();
+                final Vector2i currentPosition = position.clone();
                 Checker checkerToEat = null;
 
                 // Moving in that direction
@@ -468,7 +496,7 @@ public class Board {
                 // Finished moving
                 if (checkerToEat != null) {
                     // Found someone
-                    if (Checker.doCheckersBelongToTheSamePlayer(checkerToEat, selectedChecker)) {
+                    if (Checker.doCheckersBelongToTheSamePlayer(checkerToEat, checker)) {
                         // Can't eat because the Checkers belong to the same Player
                         continue;
                     } else {
@@ -486,6 +514,30 @@ public class Board {
         }
 
         return false;
+    }
+
+    public boolean canPlayerEat(PlayerSide playerSide) {
+        for (int column = 0; column < boardSizeInCells; column++) {
+            for (int row = 0; row < boardSizeInCells; row++) {
+                final Vector2i position = new Vector2i(column, row);
+                final Checker checker = getChecker(position);
+
+                if (checker != null) {
+                    if (checker.belongsToThisPlayerSide(playerSide)) {
+                        if (canCheckerEat(position)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // TODO:
+    public boolean canPlayerMakeAnyMove(PlayerSide playerSide) {
+        return true;
     }
 
     /**

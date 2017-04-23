@@ -158,9 +158,9 @@ public class Checker {
         queen = true;
     }
 
-//    public PlayerSide getPlayerSide() {
-//        return playerSide;
-//    }
+    public PlayerSide getPlayerSide() {
+        return playerSide;
+    }
 
     /**
      * Checks whether the specified movement direction(movement delta along Y axis) is the same as
@@ -170,6 +170,10 @@ public class Checker {
      */
     public boolean isMovementDirectionAllowed(double deltaY) {
         return Math.signum(deltaY) == Math.signum(playerSide.forwardDirectionY);
+    }
+
+    public boolean belongsToThisPlayerSide(PlayerSide playerSide) {
+        return this.playerSide.equals(playerSide);
     }
 
     public static boolean doCheckersBelongToTheSamePlayer(Checker checker1, Checker checker2) {

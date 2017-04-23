@@ -44,7 +44,7 @@ public class CheckersWindow extends Application {
                 boardSizeInPixels,
 //                boardSizeInCells,
                 boardSizeInPixels / boardSizeInCells,
-                false,
+                true,
                 MovementSpeed.FAST);
 
         Parent root;
@@ -73,8 +73,8 @@ public class CheckersWindow extends Application {
         Game game = new Game(
                 gc,
                 8,
-                new HumanPlayer(PlayerSide.PLAYER_DOWN),
                 new HumanPlayer(PlayerSide.PLAYER_UP),
+                new HumanPlayer(PlayerSide.PLAYER_DOWN),
                 CheckerColor.WHITE,
                 CheckerColor.BLACK,
                 BoardCellColor.BROWN);
