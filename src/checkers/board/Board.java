@@ -67,7 +67,7 @@ public class Board {
     }
 
     private void initializeBoard() {
-        if (true) {
+        if (false) {
             initializeBoardFromArray(new int[][]
                     {
                             {0, 0, 0, 0, 0, 0, 0, 0},
@@ -340,6 +340,15 @@ public class Board {
         selectedChecker.move(newPosition);
         board[positionOfSelectedChecker.x][positionOfSelectedChecker.y] = null;
         board[newPosition.x][newPosition.y] = selectedChecker;
+
+        // Make it a queen if it has reached the end of the board
+        final float forwardDirection = selectedChecker.getPlayerSide().forwardDirectionY;
+        if ((newPosition.y == 0 && forwardDirection < 0)
+                || (newPosition.y == boardSizeInCells - 1 && forwardDirection > 0)) {
+            selectedChecker.makeQueen();
+        }
+
+
 
         // Set this Checker to be rendered on top.
         // At any time there will be a not-null reference.

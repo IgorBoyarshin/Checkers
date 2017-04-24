@@ -72,7 +72,7 @@ public class CheckersWindow extends Application {
         // TODO: place parameters into CheckersSettings
         Game game = new Game(
                 gc,
-                8,
+                boardSizeInCells,
                 new HumanPlayer(PlayerSide.PLAYER_UP),
                 new HumanPlayer(PlayerSide.PLAYER_DOWN),
                 CheckerColor.WHITE,
