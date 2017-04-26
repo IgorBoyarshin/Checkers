@@ -1,7 +1,9 @@
 package checkers.game;
 
 /**
- * Created by Igorek on 22-Apr-17 at 3:31 PM.
+ * This enumeration describes possible states of the game.
+ *
+ * Created by Igor Boyarshin on April, 2017.
  */
 public enum GameState {
     /**

@@ -3,49 +3,48 @@ package checkers.position;
 import checkers.util.Vector2d;
 import checkers.util.Vector2i;
 
-import java.util.function.Consumer;
-
 /**
- * Created by Igorek on 09-Apr-17 at 9:10 AM.
+ * Describes a position that changes its coordinates overt time.
+ * <p>
+ * Created by Igor Boyarshin on April, 2017.
  */
 public class MovingPosition implements Positionable {
 
     /**
-     * The position of the cell(in pixels) where the movement started
+     * The position of the cell(in pixels) where the movement started.
      */
     private final BoardPosition positionStart;
 
     /**
-     * The position of the cell where the movement must end
+     * The position of the cell where the movement must end.
      */
     private final BoardPosition positionEnd;
 
     /**
      * The time(in seconds) when the movement started.
-     * Gets initialized during the first call to the update() method
+     * Gets initialized during the first call to the update() method.
      */
     private double movementTimeStartInSeconds;
 
     /**
-     * The current actual position(in pixels)
+     * The current actual position(in pixels).
      */
     private Vector2d currentPosition;
 
     /**
-     * The movement speed of the position
+     * The movement speed of the position.
      */
     private final MovementSpeed movementSpeed;
 
     /**
-     * Whether the movement has completed or not
+     * Whether the movement has completed or not.
      */
     private boolean completed;
 
     /**
-     * @param positionStart the position(in pixels) where the movement started
-     * @param positionEnd   the position(in pixels) where the movement must end
+     * @param positionStart the position(in pixels) where the movement started.
+     * @param positionEnd   the position(in pixels) where the movement must end.
      */
-    // TODO: movementSpeed
     public MovingPosition(BoardPosition positionStart, BoardPosition positionEnd,
                           MovementSpeed movementSpeed) {
         super();
@@ -54,13 +53,14 @@ public class MovingPosition implements Positionable {
         this.movementSpeed = movementSpeed;
 
         this.movementTimeStartInSeconds = 0.0;
-//        this.currentPosition = new Vector2d(positionStart.x, positionStart.y);
         this.currentPosition = positionStart.getActualPosition().clone();
         this.completed = false;
     }
 
     /**
-     * @return the actual position in pixels
+     * Returns the actual position in pixels.
+     *
+     * @return the actual position in pixels.
      */
     @Override
     public Vector2d getActualPosition() {
@@ -68,9 +68,9 @@ public class MovingPosition implements Positionable {
     }
 
     /**
-     * Updates the actual position
+     * Updates the position based on time elapsed since the start.
      *
-     * @param currentSecondsSinceStart seconds elapsed since the start of the game
+     * @param currentSecondsSinceStart seconds elapsed since the start of the game.
      */
     @Override
     public void update(double currentSecondsSinceStart) {
@@ -91,10 +91,20 @@ public class MovingPosition implements Positionable {
         }
     }
 
+    /**
+     * Returns the position where the movement must end.
+     *
+     * @return the position where the movement must end.
+     */
     public Vector2i getDestinationPosition() {
         return positionEnd.getPosition();
     }
 
+    /**
+     * Returns whether the movement has completed or not.
+     *
+     * @return whether the movement has completed or not.
+     */
     public boolean hasCompleted() {
         return completed;
     }

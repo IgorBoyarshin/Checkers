@@ -12,21 +12,51 @@ import javafx.scene.canvas.GraphicsContext;
 import checkers.util.Vector2d;
 
 /**
- * Created by Igorek on 09-Apr-17 at 8:49 AM.
+ * This class describes the game itself and its mechanics.
+ * <p>
+ * Created by Igor Boyarshin on April, 2017.
  */
 public class Game {
 
+    /**
+     * The thing we will be drawing with on the canvas.
+     */
     private final GraphicsContext gc;
 
+    /**
+     * The Player that plays for the UP side.
+     */
     private final Player playerUp;
+
+    /**
+     * The Player that plays for the DOWN side.
+     */
     private final Player playerDown;
+
+    /**
+     * The current Player(whose turn it is now).
+     */
+    private Player currentPlayer;
+
+    /**
+     * The color of the Checkers of the UP Player.
+     */
     private final CheckerColor playerUpCheckerColor;
+
+    /**
+     * The color of the Checkers of the DOWN Player.
+     */
     private final CheckerColor playerDownCheckerColor;
 
+    /**
+     * The board of the game that we will be playing on.
+     */
     private final Board board;
-    private GameState currentGameState;
 
-    private Player currentPlayer;
+    /**
+     * The current state that the game is in.
+     */
+    private GameState currentGameState;
 
     /**
      * The time in seconds when the transition(Checker movement) started.
@@ -35,11 +65,37 @@ public class Game {
      */
     private double transitionTimeStart;
 
+    /**
+     * Whether the current Player has moved during his current turn.
+     */
     private boolean playerHasMoved;
+
+    /**
+     * Whether the current Player has eaten any Checker during his current turn.
+     */
     private boolean playerEatsThisTurn;
+
+    /**
+     * Whether we have checked the ability of the current Player to make any move during his current turn.
+     */
     private boolean haveCheckedAbilityToMoveThisTurn;
+
+    /**
+     * The position(new) of the Checker that the current Player moved with last.
+     */
     private Vector2i checkerOfLastMove;
 
+    /**
+     * The constructor of the class. Initializes the fields and the board.
+     *
+     * @param gc                     the thing that we will be drawing will.
+     * @param boardSizeInCells       the size of the board in cells.
+     * @param playerUp               the Player that plays UP.
+     * @param playerDown             the Player that plays DOWN.
+     * @param playerUpCheckerColor   the color of the Checkers of the UP Player.
+     * @param playerDownCheckerColor the color of the Checkers of the DOWN Player.
+     * @param boardCellColor         the color scheme of the cells of the board.
+     */
     public Game(
             GraphicsContext gc,
             int boardSizeInCells,
@@ -73,6 +129,11 @@ public class Game {
         this.checkerOfLastMove = null;
     }
 
+    /**
+     * Processes the mouse press event on the board.
+     *
+     * @param position the position where the press occurred. (0;0) is top left corner.
+     */
     public void processMousePress(Vector2d position) {
         switch (currentGameState) {
             case PLAYER_TURN:
@@ -113,7 +174,9 @@ public class Game {
     }
 
     /**
+     * Updates the current state of the whole game and all of its components.
      *
+     * @param secondsSinceStart seconds elapsed since the start of the game.
      */
     public void update(double secondsSinceStart) {
         switch (currentGameState) {
@@ -216,13 +279,20 @@ public class Game {
         board.update(secondsSinceStart);
     }
 
+    /**
+     * Renders the game.
+     *
+     * @param secondsSinceStart seconds elapsed since the start of the game.
+     */
     // TODO: consider removing the argument
     public void render(double secondsSinceStart) {
         board.draw(gc);
     }
 
+    /**
+     * Swaps the Players(the new current Player is the one who was idle during the last turn, and vice versa).
+     */
     private void swapPlayers() {
         currentPlayer = (currentPlayer.equals(playerDown)) ? playerUp : playerDown;
     }
-
 }

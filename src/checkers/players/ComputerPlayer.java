@@ -7,10 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Igorek on 10-Apr-17 at 9:22 PM.
+ * Describes a computer Player.
+ * <p>
+ * Created by Igor Boyarshin on April, 2017.
  */
 public class ComputerPlayer extends Player {
 
+    /**
+     * Time to simulate thinking on the turn. The turn will elapse approximately that much milliseconds.
+     */
     private static final long THINKING_TIME_MILLIS = 1000;
 
     /**
@@ -28,6 +33,11 @@ public class ComputerPlayer extends Player {
      */
     private List<Pair<Vector2i>> moves;
 
+    /**
+     * The constructor for the class.
+     *
+     * @param playerSide the side of this Player.
+     */
     public ComputerPlayer(PlayerSide playerSide) {
         super(playerSide);
 
@@ -78,6 +88,12 @@ public class ComputerPlayer extends Player {
         return (System.currentTimeMillis() - thinkingTimeStartMillis) >= THINKING_TIME_MILLIS;
     }
 
+    /**
+     * Checks whether this Player is a human Player.
+     * Returns false, because it is a ComputerPlayer.
+     *
+     * @return false, because it is a ComputerPlayer.
+     */
     @Override
     public boolean isHuman() {
         return false;
@@ -85,13 +101,14 @@ public class ComputerPlayer extends Player {
 
     /**
      * Generates a series of moves for current turn.
-     * Can be overridden by subclasses
+     * Can be overridden by subclasses.
      *
-     * @return a series of moves to make
+     * @return a series of moves to make during current turn.
      */
     protected List<Pair<Vector2i>> generateMoves() {
         List<Pair<Vector2i>> moves = new ArrayList<>();
 
+        // TODO
 
         return moves;
     }

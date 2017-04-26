@@ -4,14 +4,28 @@ import checkers.util.Pair;
 import checkers.util.Vector2i;
 
 /**
- * Created by Igorek on 10-Apr-17 at 9:22 PM.
+ * Describes a human Player.
+ *
+ * Created by Igor Boyarshin on April, 2017.
  */
 public class HumanPlayer extends Player {
 
+    /**
+     * The move that this Player has made.
+     * It is stored in this variable and then accessed from the main game loop.
+     */
     private Pair<Vector2i> move;
 
+    /**
+     * Whether this Player has finished his turn.
+     */
     private boolean turnFinished;
 
+    /**
+     * The constructor for the class.
+     *
+     * @param playerSide the side of this Player.
+     */
     public HumanPlayer(PlayerSide playerSide) {
         super(playerSide);
 
@@ -28,13 +42,24 @@ public class HumanPlayer extends Player {
     }
 
     /**
-     * Finishes the HumanPlayer move
+     * Finishes the HumanPlayer move.
+     * As a human being is the most difficult thing to communicate with, we need special means to do it.
+     * This method will be called from the main game loop when this Player will have finished making his move.
+     * As it would be inconvenient to make the player press a button each time he has made a move, we want to
+     * figure out for him most cases when he has finished. That's when this method is called.
      */
-    // TODO: write documentation(explain when and why is used)
     public void forceTurnFinish() {
         this.turnFinished = true;
     }
 
+    /**
+     * Asks this Player whether he has come up with a move to make.
+     * If he has come up with something, return the move as a Pair of coordinates - the position
+     * of the Checker to move and where to move it.
+     * If the Player hasn't come up with a move yet, return null.
+     *
+     * @return the move that the Player has come up with, null otherwise.
+     */
     @Override
     public Pair<Vector2i> makeMove() {
         final Pair<Vector2i> moveToMake = move;
@@ -43,16 +68,32 @@ public class HumanPlayer extends Player {
         return moveToMake;
     }
 
+    /**
+     * Checks whether the Player has finished his turn.
+     *
+     * @return true if the Player has finished his turn, false otherwise.
+     */
     @Override
     public boolean isTurnFinished() {
         return turnFinished;
     }
 
+    /**
+     * Is called when the Game has seen that the Player has finished his turn.
+     * The Game will now move into the TRANSITION state.
+     * Prepares the fields for the next turn.
+     */
     @Override
     public void confirmTurnFinished() {
         turnFinished = false; // prepare for next turn
     }
 
+    /**
+     * Checks whether this Player is a human player.
+     * Returns true, because it is a HumanPlayer.
+     *
+     * @return true, because this is a HumanPlayer.
+     */
     @Override
     public boolean isHuman() {
         return true;

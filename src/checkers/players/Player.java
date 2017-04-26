@@ -4,12 +4,22 @@ import checkers.util.Pair;
 import checkers.util.Vector2i;
 
 /**
- * Created by Igorek on 10-Apr-17 at 9:21 PM.
+ * Describes an abstract Player. Other Player classes will be inherited from it.
+ * <p>
+ * Created by Igor Boyarshin on April, 2017.
  */
 public abstract class Player {
 
+    /**
+     * The side that this Player plays for.
+     */
     private final PlayerSide playerSide;
 
+    /**
+     * The constructor for the class.
+     *
+     * @param playerSide the side that this Player plays for.
+     */
     Player(PlayerSide playerSide) {
         this.playerSide = playerSide;
     }
@@ -38,11 +48,20 @@ public abstract class Player {
      * The Game will now move into the TRANSITION state.
      * The default implementation is empty, override it if some actions need to be performed.
      */
-    // TODO: consider renaming
     public void confirmTurnFinished() {}
 
+    /**
+     * Checks whether this Player is a human player.
+     *
+     * @return whether this Player is a human player.
+     */
     public abstract boolean isHuman();
 
+    /**
+     * Returns the side of this Player.
+     *
+     * @return the side of this Player.
+     */
     public PlayerSide getPlayerSide() {
         return playerSide;
     }
