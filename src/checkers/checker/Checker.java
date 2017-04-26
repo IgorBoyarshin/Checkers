@@ -232,7 +232,7 @@ public class Checker {
     /**
      * Returns whether the Checker is a queen.
      *
-     * @return
+     * @return whether the Checker is a queen.
      */
     public boolean isQueen() {
         return queen;
@@ -258,6 +258,7 @@ public class Checker {
      * Checks whether the specified movement direction(movement delta along Y axis) is the same as
      * allowed movement direction(specified in PlayerSide.forwardDirectionY).
      *
+     * @param deltaY the direction step to check.
      * @return whether this Checker is allowed to move in the specified direction along Y axis.
      */
     public boolean isMovementDirectionAllowed(double deltaY) {

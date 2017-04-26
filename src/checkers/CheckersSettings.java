@@ -3,7 +3,7 @@ package checkers;
 import checkers.position.MovementSpeed;
 
 /**
- * This class describes the application settings
+ * This class describes the application settings.
  * <p>
  * Created by Igor Boyarshin on April, 2017.
  */

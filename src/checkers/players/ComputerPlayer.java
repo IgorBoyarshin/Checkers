@@ -47,7 +47,7 @@ public class ComputerPlayer extends Player {
 
     /**
      * Asks the Player to make a move.
-     * If the Player does not know for now what move to make => return null.
+     * If the Player does not know for now what move to make, return null.
      * Otherwise return a pair of two positions: what Checker to move and where to move it.
      * A Player can make several moves during his turn(separated with arbitrary amount of null-moves),
      * provided that all the moves are eating-moves.
@@ -77,7 +77,7 @@ public class ComputerPlayer extends Player {
     /**
      * Checks whether the Player has finished his turn.
      * Note that in the case of ComputerPlayer the actual condition of the end of the turn is
-     * (isTurnFinished() && makeMove() == null).
+     * (isTurnFinished() AND makeMove() == null).
      * In most cases (makeMove() == null) should already be true if isTurnFinished() returns true.
      *
      * @return true if the Player has finished his turn, false otherwise.

@@ -427,8 +427,9 @@ public class Board {
 
     /**
      * Checks whether the selected checker is allowed to move into the specified cell.
-     * Will ban the move if (eating is mandatory && no eating during the move).
+     * Will ban the move if (eating is mandatory AND no eating during the move).
      *
+     * @param newPosition the position where the Checker should move.
      * @return true if a checker is selected and it is allowed to move into the specified cell,
      * false otherwise.
      */

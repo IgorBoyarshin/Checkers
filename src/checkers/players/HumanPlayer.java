@@ -5,7 +5,7 @@ import checkers.util.Vector2i;
 
 /**
  * Describes a human Player.
- *
+ * <p>
  * Created by Igor Boyarshin on April, 2017.
  */
 public class HumanPlayer extends Player {
@@ -36,6 +36,8 @@ public class HumanPlayer extends Player {
      * Provides this HumanPlayer with a move that he must make.
      * Essentially serves as a means to make the makeMove() method return the given value.
      * This method is called when an Event during the HumanPlayer turn happens.
+     *
+     * @param move the move to accept.
      */
     public void acceptMove(Pair<Vector2i> move) {
         this.move = move;

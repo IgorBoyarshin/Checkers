@@ -26,7 +26,7 @@ public abstract class Player {
 
     /**
      * Asks the Player to make a move.
-     * If the Player does not know for now what move to make => return null.
+     * If the Player does not know for now what move to make, return null.
      * Otherwise return a pair of two positions: what Checker to move and where to move it.
      * A Player can make several moves during his turn(separated with arbitrary amount of null-moves),
      * provided that all the moves are eating-moves.

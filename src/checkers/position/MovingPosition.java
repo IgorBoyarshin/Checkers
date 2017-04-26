@@ -42,8 +42,11 @@ public class MovingPosition implements Positionable {
     private boolean completed;
 
     /**
-     * @param positionStart the position(in pixels) where the movement started.
-     * @param positionEnd   the position(in pixels) where the movement must end.
+     * The constructor for this class.
+     *
+     * @param positionStart the starting position of the movement.
+     * @param positionEnd the end position of the movement.
+     * @param movementSpeed the speed of the movement.
      */
     public MovingPosition(BoardPosition positionStart, BoardPosition positionEnd,
                           MovementSpeed movementSpeed) {
