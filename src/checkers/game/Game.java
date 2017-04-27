@@ -279,6 +279,14 @@ public class Game {
         board.update(secondsSinceStart);
     }
 
+    public int[][] getGameRepresentationAsArray() {
+        return null;
+    }
+
+    public boolean isPlayerDownTurn() {
+        return false;
+    }
+
     /**
      * Renders the game.
      *
