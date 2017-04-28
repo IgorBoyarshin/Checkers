@@ -36,6 +36,11 @@ public class CheckersSettings {
     public final double boardSizeInPixels;
 
     /**
+     * The size of the board in cells.
+     */
+    public final int boardSizeInCells;
+
+    /**
      * Whether eating is mandatory.
      */
     public final boolean isEatingMandatory;
@@ -57,6 +62,7 @@ public class CheckersSettings {
      * @param windowWidth       the width of the window.
      * @param windowHeight      the height of the window.
      * @param boardSizeInPixels the size of the board in pixels.
+     * @param boardSizeInCells  the size of the board in cells.
      * @param cellSize          the size of a cell in pixels.
      * @param isEatingMandatory whether eating is mandatory.
      * @param movementSpeed     the movement speed of a Checker.
@@ -66,6 +72,7 @@ public class CheckersSettings {
             int windowWidth,
             int windowHeight,
             double boardSizeInPixels,
+            int boardSizeInCells,
             double cellSize,
             boolean isEatingMandatory,
             MovementSpeed movementSpeed
@@ -74,6 +81,7 @@ public class CheckersSettings {
         this.windowHeight = windowHeight;
         this.windowWidth = windowWidth;
         this.boardSizeInPixels = boardSizeInPixels;
+        this.boardSizeInCells = boardSizeInCells;
         this.isEatingMandatory = isEatingMandatory;
         this.cellSize = cellSize;
         this.movementSpeed = movementSpeed;

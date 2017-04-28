@@ -1,7 +1,10 @@
 package checkers.players;
 
+import checkers.board.FunctionGetBoardRepresentation;
 import checkers.util.Pair;
 import checkers.util.Vector2i;
+
+import java.util.function.Predicate;
 
 /**
  * Describes an abstract Player. Other Player classes will be inherited from it.
@@ -13,7 +16,7 @@ public abstract class Player {
     /**
      * The side that this Player plays for.
      */
-    private final PlayerSide playerSide;
+    protected final PlayerSide playerSide;
 
     /**
      * The constructor for the class.
@@ -31,10 +34,18 @@ public abstract class Player {
      * A Player can make several moves during his turn(separated with arbitrary amount of null-moves),
      * provided that all the moves are eating-moves.
      *
+     * @param functionGetBoardRepresentation the function by which the Player can receive the current situation on the board.
+     * @param playerCode the code of the Player in the board representation.
+     * @param canCheckerEat function o determine whether the Checker can eat.
+     * @param canCheckerMove function o determine whether the Checker can move.
      * @return a Pair of positions: what Checker to move and where to move it,
      * null if the Player has not come up with a move yet.
      */
-    public abstract Pair<Vector2i> makeMove();
+    public abstract Pair<Vector2i> makeMove(
+            FunctionGetBoardRepresentation functionGetBoardRepresentation,
+            int playerCode,
+            Predicate<Vector2i> canCheckerEat,
+            Predicate<Vector2i> canCheckerMove);
 
     /**
      * Checks whether the Player has finished making his turn.

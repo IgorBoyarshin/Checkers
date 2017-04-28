@@ -1,7 +1,10 @@
 package checkers.players;
 
+import checkers.board.FunctionGetBoardRepresentation;
 import checkers.util.Pair;
 import checkers.util.Vector2i;
+
+import java.util.function.Predicate;
 
 /**
  * Describes a human Player.
@@ -60,10 +63,16 @@ public class HumanPlayer extends Player {
      * of the Checker to move and where to move it.
      * If the Player hasn't come up with a move yet, return null.
      *
+     * @param functionGetBoardRepresentation the function by which the Player can receive the current situation on the board.
+     * @param playerCode                     the code of the Player in the board representation.
      * @return the move that the Player has come up with, null otherwise.
      */
     @Override
-    public Pair<Vector2i> makeMove() {
+    public Pair<Vector2i> makeMove(
+            FunctionGetBoardRepresentation functionGetBoardRepresentation,
+            int playerCode,
+            Predicate<Vector2i> canCheckerEat,
+            Predicate<Vector2i> canCheckerMove) {
         final Pair<Vector2i> moveToMake = move;
         this.move = null; // don't make this move next time
 

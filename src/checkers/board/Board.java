@@ -67,7 +67,23 @@ public class Board {
     private Vector2i positionOfDyingChecker;
 
     /**
-     * The constructor of the class.
+     * The code for the PlayerUp in the board representation.
+     */
+    public static final int boardRepresentationNoCheckerCode = 0;
+
+    /**
+     * The code for the PlayerUp in the board representation.
+     */
+    public static final int boardRepresentationPlayerUpCheckerCode = 1;
+
+    /**
+     * The code for the PlayerDown in the board representation.
+     */
+    public static final int boardRepresentationPlayerDownCheckerCode = 2;
+
+    /**
+     * The first constructor of the class.
+     * Initializes the board with default layout.
      *
      * @param boardSizeInCells       the size of the board in cells.
      * @param playerUpCheckerColor   the color scheme of the Checkers of the UP Player.
@@ -76,7 +92,8 @@ public class Board {
      */
     public Board(
             int boardSizeInCells,
-            CheckerColor playerUpCheckerColor, CheckerColor playerDownCheckerColor,
+            CheckerColor playerUpCheckerColor,
+            CheckerColor playerDownCheckerColor,
             BoardCellColor boardCellColor) {
 
         this.boardSizeInCells = boardSizeInCells;
@@ -94,24 +111,55 @@ public class Board {
     }
 
     /**
-     * Initializes the board with Checkers.
+     * The second constructor of the class.
+     * Initializes the board from the given array.
+     *
+     * @param boardSizeInCells       the size of the board in cells.
+     * @param boardRepresentation    the array representation of the board to initialize with.
+     * @param playerUpCheckerColor   the color scheme of the Checkers of the UP Player.
+     * @param playerDownCheckerColor the color scheme of the Checkers of the DOWN Player.
+     * @param boardCellColor         the color scheme of the cells of the Board.
+     */
+    public Board(
+            int boardSizeInCells,
+            int[][] boardRepresentation,
+            CheckerColor playerUpCheckerColor,
+            CheckerColor playerDownCheckerColor,
+            BoardCellColor boardCellColor) {
+
+        this.boardSizeInCells = boardSizeInCells;
+        this.playerUpCheckerColor = playerUpCheckerColor;
+        this.playerDownCheckerColor = playerDownCheckerColor;
+        this.boardCellColor = boardCellColor;
+
+        this.board = new Checker[boardSizeInCells][boardSizeInCells];
+        initializeBoardFromArray(boardRepresentation);
+
+        this.positionOfSelectedChecker = null;
+        this.checkerToDrawOnTop = null;
+        this.dyingChecker = null;
+        this.positionOfDyingChecker = null;
+    }
+
+    /**
+     * Initializes the board with Checkers using a default layout.
      */
     private void initializeBoard() {
-        if (false) {
-            initializeBoardFromArray(new int[][]
-                    {
-                            {0, 0, 0, 0, 0, 0, 0, 0},
-                            {0, 0, 0, 0, 0, 0, 0, 0},
-                            {0, 0, 0, 0, 0, 1, 0, 0},
-                            {0, 0, 1, 0, 0, 0, 2, 0},
-                            {0, 0, 0, 0, 0, 0, 0, 0},
-                            {0, 0, 1, 0, 0, 0, 0, 0},
-                            {0, 0, 0, 2, 0, 0, 0, 0},
-                            {0, 0, 0, 0, 0, 0, 0, 0}
-                    });
-
-            return;
-        }
+//        if (false) {
+//            initializeBoardFromArray(new int[][]
+//                    {
+//                            {0, 0, 0, 0, 0, 0, 0, 0},
+//                            {0, 0, 0, 0, 0, 0, 0, 0},
+//                            {0, 0, 0, 0, 0, 1, 0, 0},
+//                            {0, 0, 1, 0, 0, 0, 2, 0},
+//                            {0, 0, 0, 0, 0, 0, 0, 0},
+//                            {0, 0, 1, 0, 0, 0, 0, 0},
+//                            {0, 0, 0, 2, 0, 0, 0, 0},
+//                            {0, 0, 0, 0, 0, 0, 0, 0}
+//                    });
+//
+//            return;
+//        }
 
         final int rowsOfCellsPerPlayer = boardSizeInCells / 2 - 1;
 
@@ -151,12 +199,12 @@ public class Board {
      * @param array the array to initialize the Board from.
      */
     private void initializeBoardFromArray(int[][] array) {
-        for (int row = 0; row < boardSizeInCells; row++) {
-            for (int column = 0; column < boardSizeInCells; column++) {
+        for (int column = 0; column < boardSizeInCells; column++) {
+            for (int row = 0; row < boardSizeInCells; row++) {
                 final Vector2i boardPosition = new Vector2i(column, row);
 
                 final Checker checker;
-                switch (array[row][column]) {
+                switch (array[column][row]) {
                     case 1: // PLAYER_UP Checker
                         checker = new Checker(playerUpCheckerColor, PlayerSide.PLAYER_UP, boardPosition);
                         break;
@@ -179,6 +227,51 @@ public class Board {
                 board[column][row] = checker;
             }
         }
+    }
+
+    /**
+     * Returns the representation of the board(its current state) as an array.
+     * 0 == no Checker.
+     * 1 == PLAYER_UP Checker
+     * -1 == PLAYER_UP Checker queen
+     * 2 == PLAYER_DOWN Checker
+     * -2 == PLAYER_DOWN Checker queen
+     *
+     * @return the representation of the board(its current state) as an array.
+     */
+    public int[][] getBoardRepresentationAsArray() {
+        int[][] boardRepresentation = new int[boardSizeInCells][boardSizeInCells];
+
+        for (int column = 0; column < boardSizeInCells; column++) {
+            for (int row = 0; row < boardSizeInCells; row++) {
+                final Vector2i position = new Vector2i(column, row);
+                final Checker checker = getChecker(position);
+                int code;
+
+                if (checker == null) {
+                    code = boardRepresentationNoCheckerCode;
+                } else {
+                    switch (checker.getPlayerSide()) {
+                        case PLAYER_UP:
+                            code = boardRepresentationPlayerUpCheckerCode;
+                            break;
+                        case PLAYER_DOWN:
+                            code = boardRepresentationPlayerDownCheckerCode;
+                            break;
+                        default:
+                            code = boardRepresentationNoCheckerCode;
+                    }
+
+                    if (checker.isQueen()) {
+                        code *= -1;
+                    }
+                }
+
+                boardRepresentation[column][row] = code;
+            }
+        }
+
+        return boardRepresentation;
     }
 
     /**
@@ -341,6 +434,7 @@ public class Board {
     /**
      * Returns the checker at the specified position if the position is valid and there is a checker present.
      * Return null otherwise.
+     * Vector2i(column, row).
      *
      * @param position the position of the desired checker.
      * @return the checker at that position if the position is valid and there is a checker present, null otherwise.
@@ -433,7 +527,6 @@ public class Board {
      * @return true if a checker is selected and it is allowed to move into the specified cell,
      * false otherwise.
      */
-    // TODO: Architecture is too complex
     public boolean isMovePossibleWithSelectedChecker(Vector2i newPosition) {
         final Checker selectedChecker = getChecker(positionOfSelectedChecker);
         if (selectedChecker == null) { // if a checker is not selected
@@ -520,6 +613,60 @@ public class Board {
     }
 
     /**
+     * Checks whether any move(eating or just moving) is possible with the Checker at the specified position.
+     *
+     * @param position the position at which to check the Checker.
+     * @return whether any move(eating or just moving) is possible with the Checker at the specified position.
+     */
+    public boolean canCheckerMoveOrEat(Vector2i position) {
+        return (canCheckerMove(position) || canCheckerEat(position));
+    }
+
+    /**
+     * Checks whether the Checker at the specified position can move(not eat).
+     *
+     * @param position the position at which to check the Checker.
+     * @return whether the Checker at the specified position can move(not eat).
+     */
+    public boolean canCheckerMove(Vector2i position) {
+        final Checker checker = getChecker(position);
+        if (checker == null) { // if there is no Checker here
+            return false;
+        }
+
+        // Strategy:
+        // Try all 4 diagonal directions. Move a single step.
+        // If we encounter an empty cell => return true
+
+        // Cycle for all 4 diagonal directions
+        for (int deltaX = -1; deltaX <= +1; deltaX += 2) {
+            for (int deltaY = -1; deltaY <= +1; deltaY += 2) {
+                if (!checker.isQueen() && checker.getPlayerSide().forwardDirectionY != deltaY) {
+                    // Can't move in that direction
+                    continue;
+                }
+
+                final Vector2i currentPosition = position.clone();
+                currentPosition.x += deltaX;
+                currentPosition.y += deltaY;
+
+                if (!isPositionValid(currentPosition)) {
+                    // If we went outside the board => wrong move
+                    continue;
+                }
+
+                final Checker checkerFound = getChecker(currentPosition);
+                if (checkerFound == null) {
+                    // Found an empty cell => can move into it
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns whether the Checker at the specified position can eat now.
      *
      * @param position the position of the Checker.
@@ -527,7 +674,7 @@ public class Board {
      */
     public boolean canCheckerEat(Vector2i position) {
         final Checker checker = getChecker(position);
-        if (checker == null) { // if a checker is not selected
+        if (checker == null) { // if there is no checker here
             return false;
         }
 
@@ -623,9 +770,23 @@ public class Board {
      * @param playerSide the PlayerSide for which to perform the Check.
      * @return whether the given PlayerSide can make any move now.
      */
-    // TODO:
     public boolean canPlayerMakeAnyMove(PlayerSide playerSide) {
-        return true;
+        for (int column = 0; column < boardSizeInCells; column++) {
+            for (int row = 0; row < boardSizeInCells; row++) {
+                final Vector2i position = new Vector2i(column, row);
+                final Checker checker = getChecker(position);
+
+                if (checker != null) {
+                    if (checker.belongsToPlayerSide(playerSide)) {
+                        if (canCheckerMoveOrEat(position)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

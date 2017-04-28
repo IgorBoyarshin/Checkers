@@ -6,10 +6,13 @@ import checkers.board.BoardCellColor;
 import checkers.checker.CheckerColor;
 import checkers.players.HumanPlayer;
 import checkers.players.Player;
+import checkers.players.PlayerSide;
 import checkers.util.Pair;
 import checkers.util.Vector2i;
 import javafx.scene.canvas.GraphicsContext;
 import checkers.util.Vector2d;
+
+import java.util.function.Consumer;
 
 /**
  * This class describes the game itself and its mechanics.
@@ -85,6 +88,8 @@ public class Game {
      */
     private Vector2i checkerOfLastMove;
 
+    private Consumer<String> writeOnGameInfoLabel;
+
     /**
      * The constructor of the class. Initializes the fields and the board.
      *
@@ -95,19 +100,22 @@ public class Game {
      * @param playerUpCheckerColor   the color of the Checkers of the UP Player.
      * @param playerDownCheckerColor the color of the Checkers of the DOWN Player.
      * @param boardCellColor         the color scheme of the cells of the board.
+     * @param writeOnGameInfoLabel   the function to write on GameInfo Label.
      */
     public Game(
             GraphicsContext gc,
             int boardSizeInCells,
             Player playerUp, Player playerDown,
             CheckerColor playerUpCheckerColor, CheckerColor playerDownCheckerColor,
-            BoardCellColor boardCellColor) {
+            BoardCellColor boardCellColor,
+            Consumer<String> writeOnGameInfoLabel) {
 
         this.gc = gc;
         this.playerUp = playerUp;
         this.playerDown = playerDown;
         this.playerUpCheckerColor = playerUpCheckerColor;
         this.playerDownCheckerColor = playerDownCheckerColor;
+        this.writeOnGameInfoLabel = writeOnGameInfoLabel;
 
         this.board = new Board(
                 boardSizeInCells,
@@ -117,8 +125,61 @@ public class Game {
 
         this.currentPlayer = playerDown;
 
-        // The game has not started yet
-        this.currentGameState = GameState.IDLE;
+        this.currentGameState = GameState.PLAYER_TURN;
+        System.out.println(currentPlayer.getPlayerSide().toString() + " move");
+
+        this.transitionTimeStart = 0.0;
+
+        this.playerHasMoved = false;
+        this.playerEatsThisTurn = false;
+        this.haveCheckedAbilityToMoveThisTurn = false;
+
+        this.checkerOfLastMove = null;
+    }
+
+    /**
+     * The constructor of the class. Initializes the fields and the board.
+     *
+     * @param gc                     the thing that we will be drawing will.
+     * @param boardSizeInCells       the size of the board in cells.
+     * @param boardRepresentation    the array representation of the board.
+     * @param isPlayerDownTurn       whether it is currently PlayerDOwn turn.
+     * @param playerUp               the Player that plays UP.
+     * @param playerDown             the Player that plays DOWN.
+     * @param playerUpCheckerColor   the color of the Checkers of the UP Player.
+     * @param playerDownCheckerColor the color of the Checkers of the DOWN Player.
+     * @param boardCellColor         the color scheme of the cells of the board.
+     * @param writeOnGameInfoLabel   the function to write on GameInfo Label.
+     */
+    public Game(
+            GraphicsContext gc,
+            int boardSizeInCells,
+            int[][] boardRepresentation,
+            boolean isPlayerDownTurn,
+            Player playerUp, Player playerDown,
+            CheckerColor playerUpCheckerColor, CheckerColor playerDownCheckerColor,
+            BoardCellColor boardCellColor,
+            Consumer<String> writeOnGameInfoLabel) {
+
+        this.gc = gc;
+        this.playerUp = playerUp;
+        this.playerDown = playerDown;
+        this.playerUpCheckerColor = playerUpCheckerColor;
+        this.playerDownCheckerColor = playerDownCheckerColor;
+        this.writeOnGameInfoLabel = writeOnGameInfoLabel;
+
+        this.board = new Board(
+                boardSizeInCells,
+                boardRepresentation,
+                playerUpCheckerColor,
+                playerDownCheckerColor,
+                boardCellColor);
+
+        this.currentPlayer = isPlayerDownTurn ? playerDown : playerUp;
+
+        this.currentGameState = GameState.PLAYER_TURN;
+        System.out.println(currentPlayer.getPlayerSide().toString() + " move");
+        writeOnGameInfoLabel.accept(currentPlayer.getPlayerSide().toString() + " move");
 
         this.transitionTimeStart = 0.0;
 
@@ -181,7 +242,13 @@ public class Game {
     public void update(double secondsSinceStart) {
         switch (currentGameState) {
             case PLAYER_TURN:
-                final Pair<Vector2i> move = currentPlayer.makeMove();
+                final Pair<Vector2i> move = currentPlayer.makeMove(
+                        board::getBoardRepresentationAsArray,
+                        getPlayerCodeInBoardRepresentation(currentPlayer),
+                        board::canCheckerEat,
+                        board::canCheckerMove
+                );
+
                 if (move == null) {
                     if (currentPlayer.isTurnFinished()) {
                         // transition
@@ -253,6 +320,11 @@ public class Game {
 
                 break;
             case TRANSITION:
+                if (board.getAmountOfCheckersOnBoard(currentPlayer.getPlayerSide()) == 0) {
+                    // He has been beaten => game finished
+                    this.currentGameState = GameState.IDLE;
+                }
+
                 // Just waits for the movement to end, then switches back to PLAYER_TURN
 
                 if (transitionTimeStart == 0.0) { // We just got here
@@ -266,12 +338,13 @@ public class Game {
                         this.transitionTimeStart = 0.0; // prepare for next transition
 
                         System.out.println(currentPlayer.getPlayerSide().toString() + " move");
+                        writeOnGameInfoLabel.accept(currentPlayer.getPlayerSide().toString() + " move");
                     }
                 }
                 break;
             case IDLE:
-                currentGameState = GameState.PLAYER_TURN;
-                System.out.println(currentPlayer.getPlayerSide().toString() + " move");
+//                currentGameState = GameState.PLAYER_TURN;
+
                 break;
             default:
         }
@@ -279,12 +352,45 @@ public class Game {
         board.update(secondsSinceStart);
     }
 
-    public int[][] getGameRepresentationAsArray() {
-        return null;
+    /**
+     * Returns the representation of the board(its current state) as an array.
+     * 0 == no Checker.
+     * 1 == PLAYER_UP Checker
+     * -1 == PLAYER_UP Checker queen
+     * 2 == PLAYER_DOWN Checker
+     * -2 == PLAYER_DOWN Checker queen
+     *
+     * @return the representation of the board(its current state) as an array.
+     */
+    public int[][] getBoardRepresentationAsArray() {
+        return board.getBoardRepresentationAsArray();
     }
 
+    /**
+     * Returns whether it is currently PlayerDown's turn.
+     *
+     * @return whether it is currently PlayerDown's turn.
+     */
     public boolean isPlayerDownTurn() {
-        return false;
+        return currentPlayer == playerDown;
+    }
+
+    /**
+     * Translates the PlayerSide into player code in board representation.
+     *
+     * @param player the Player to get the PlayerSide from.
+     * @return the player code in board representation.
+     */
+    private int getPlayerCodeInBoardRepresentation(Player player) {
+        final PlayerSide playerSide = player.getPlayerSide();
+        switch (playerSide) {
+            case PLAYER_DOWN:
+                return Board.boardRepresentationPlayerDownCheckerCode;
+            case PLAYER_UP:
+                return Board.boardRepresentationPlayerUpCheckerCode;
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -302,5 +408,23 @@ public class Game {
      */
     private void swapPlayers() {
         currentPlayer = (currentPlayer.equals(playerDown)) ? playerUp : playerDown;
+    }
+
+    /**
+     * Returns whether the PlayerUp is a HumanPlayer.
+     *
+     * @return whether the PlayerUp is a HumanPlayer.
+     */
+    public boolean isPlayerUpHuman() {
+        return playerUp.isHuman();
+    }
+
+    /**
+     * Returns whether the PlayerDown is a HumanPlayer.
+     *
+     * @return whether the PlayerDown is a HumanPlayer.
+     */
+    public boolean isPlayerDownHuman() {
+        return playerDown.isHuman();
     }
 }
