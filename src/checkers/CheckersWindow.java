@@ -196,8 +196,8 @@ public class CheckersWindow extends Application implements Initializable {
 
         // Set up the PlayerUp ComboBox
         comboBoxPlayerUp.getItems().addAll(new String[]{computerPlayerStringCode, humanPlayerStringCode});
-        comboBoxPlayerUp.getSelectionModel().select(humanPlayerStringCode);
-        comboBoxPlayerUp.promptTextProperty().setValue(humanPlayerStringCode);
+        comboBoxPlayerUp.getSelectionModel().select(computerPlayerStringCode);
+        comboBoxPlayerUp.promptTextProperty().setValue(computerPlayerStringCode);
 
         // Set up the BoardSize ComboBox
         Arrays.stream(supportedBoardSizes).forEach(comboBoxBoardSize.getItems()::add);
